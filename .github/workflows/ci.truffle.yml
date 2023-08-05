@@ -1,0 +1,47 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Truffle CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+
+jobs:
+
+  job1:
+    name: deploy to staging
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup NodeJS 16
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - name: Show NodeJS version    
+      run: npm --version
+      
+    - name: Install Truffle
+      run: npm install truffle -g
+      
+    - name: Install Truffle Dependencies
+      run: npm install 
+
+    # - name: Build project
+    #   run: truffle build 
+
+    - name: install Ganche
+      run: npm install -g ganache
+
+    - name: Start Ganache
+      run: ganache-cli -p 7545 --logging.debug --chain.hardfork "muirGlacier" --chain.vmErrorsOnRPCResponse > /dev/null 2>&1 &
+      # run:  ganache-cli -p 7545  
+      #> /dev/null 2>&1 &
+      
+
+    - name: Wait for Ganache to start
+      run: sleep 5
+
+    - name: Run Truffle Test with CI=true for Codechecks  
+      run: truffle test
