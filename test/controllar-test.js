@@ -38,6 +38,7 @@ contract("Manager Contract", (accounts) => {
 
       assertEventArray(["addNewUserAddress"], emitedEvents);
     });
+
     it("should set user with Admin role", async () => {
       const adminAddress = accounts[1];
       const newUser = accounts[2];
@@ -51,6 +52,7 @@ contract("Manager Contract", (accounts) => {
 
       assertEventArray(["addNewUserAddress"], emitedEvents);
     });
+
     it("can not set user role without secondary auth", async () => {
       const fakeUser = accounts[1];
       const newUser = accounts[2];
@@ -59,6 +61,19 @@ contract("Manager Contract", (accounts) => {
         addNewUser(newUser, User, fakeUser),
         "You havent authority to access ERROR:1"
       );
+    });
+    it("can not set Project owner role without secondary auth", async () => {
+      throw new Error("Not completed");
+    });
+
+    it("can not set Admin role without gov auth", async () => {
+      throw new Error("Not completed");
+    });
+    it("can not set new role without user info", async () => {
+      throw new Error("Not completed");
+    });
+    it("can not set another GOV auth", async () => {
+      throw new Error("Not completed");
     });
   });
 
