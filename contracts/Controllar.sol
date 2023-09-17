@@ -2,9 +2,11 @@
 pragma solidity ^0.8.17;
 
 enum Role {
-    Default, //0
+    NotRegisterd , //0
     Admin, // 1
-    User // 2
+    User, // 2
+    ProjectOwner, //3
+    Gov //4
 }
 
 contract Controllar {
@@ -38,7 +40,12 @@ contract Controllar {
 
     //external
     function getUserRole() external view returns (Role) {
-        return (userRoleMap[msg.sender]);
+        if(requireGovAddress()){
+           return Role.Gov;
+        }
+        else{
+             return userRoleMap[msg.sender];
+        }
     }
 
     function setUserRole(
