@@ -3,7 +3,7 @@ const truffleAssert = require("truffle-assertions");
 const chai = require("chai");
 const expect = chai.expect;
 
-const [Default, Admin, User] = [0, 1, 2];
+const [NotRegisterd, Admin, User, ProjectOwner, Gov] = [0, 1, 2, 3, 4];
 
 contract("Manager Contract", (accounts) => {
   const govAddress = accounts[0];
@@ -66,11 +66,42 @@ contract("Manager Contract", (accounts) => {
     it("should return user role", async () => {
       const newUser = accounts[1];
 
+      await truffleAssert.passes(addNewUser(newUser, User));
+
+      const result = await contract.getUserRole({ from: newUser });
+
+      expect(parseInt(result)).to.be.eql(User);
+    });
+
+    it("should return gov role", async () => {
+      const result = await contract.getUserRole({ from: govAddress });
+
+      expect(parseInt(result)).to.be.eql(Gov);
+    });
+
+    it("should return unregisterd role", async () => {
+      const user = accounts[1];
+      const result = await contract.getUserRole({ from: user });
+
+      expect(parseInt(result)).to.be.eql(NotRegisterd);
+    });
+    it("should return Admin role", async () => {
+      const newUser = accounts[1];
+
       await truffleAssert.passes(addNewUser(newUser, Admin));
 
       const result = await contract.getUserRole({ from: newUser });
 
       expect(parseInt(result)).to.be.eql(Admin);
+    });
+    it("should return Project owner role", async () => {
+      const newUser = accounts[1];
+
+      await truffleAssert.passes(addNewUser(newUser, ProjectOwner));
+
+      const result = await contract.getUserRole({ from: newUser });
+
+      expect(parseInt(result)).to.be.eql(ProjectOwner);
     });
   });
 });
