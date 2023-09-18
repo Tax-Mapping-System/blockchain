@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-enum Role {
-    NotRegisterd , //0
-    Admin, // 1
-    User, // 2
-    ProjectOwner, //3
-    Gov //4
-}
+import "./interface/IController.sol";
 
-contract Controllar {
+
+
+contract Controllar is IController {
+
+  
     address private immutable govAddress;
 
     mapping(address => Role) private userRoleMap; //users rols
-    mapping(address => bytes) private userInformationMap; //duble encripted byte converted object string
+    mapping(address => UserData) private userInformationMap; //duble encripted byte converted object string
 
 
     constructor(){
@@ -21,10 +19,11 @@ contract Controllar {
         userRoleMap[msg.sender]= Role.Gov ;
     }
 
-    //events
-    event addNewUserAddress(address indexed user, Role indexed role);
-
     //modifires
+    modifier onlyGov() {
+        requireGov();
+        _;
+    }
 
     modifier onlySecondaryAuth() {
         require(
@@ -35,13 +34,7 @@ contract Controllar {
         _;
     }
 
-    modifier onlyGov() {
-        requireGov();
-        _;
-    }
-
     //internal
-
     function isSenderGovAddress() internal view returns (bool) {
         return (msg.sender == govAddress);
     }
@@ -51,10 +44,10 @@ contract Controllar {
     }
 
     function setUserData(bytes calldata userInfo, address userAddress) internal {
-        userInformationMap[userAddress] = userInfo;
+        userInformationMap[userAddress].userInfo = userInfo;
     }
 
-    function getUserData(address userAddress) internal view returns(bytes memory){
+    function getUserData(address userAddress) internal view returns(UserData memory){
         return userInformationMap[userAddress];
     }
 
@@ -82,11 +75,11 @@ contract Controllar {
         emit addNewUserAddress(newUserAddress, role);
     }
 
-    function getMyUserData() external view returns(bytes memory){
+    function getMyUserData() external view returns(UserData memory){
         return getUserData(msg.sender);
     }
 
-    function getIndividualUserData(address userAddress) external view onlySecondaryAuth returns (bytes memory){
+    function getIndividualUserData(address userAddress) external view onlySecondaryAuth returns (UserData memory){
         return getUserData(userAddress);
     }
 }
