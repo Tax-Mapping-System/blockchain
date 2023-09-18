@@ -22,7 +22,7 @@ contract Controllar {
 
     modifier onlySecondaryAuth() {
         require(
-            requireGovAddress() || userRoleMap[msg.sender] == Role.Admin,
+            isSenderGovAddress() || userRoleMap[msg.sender] == Role.Admin,
             "You havent authority to access ERROR:1"
         );
 
@@ -30,13 +30,18 @@ contract Controllar {
     }
 
     modifier onlyGov() {
-        require(requireGovAddress(), "You havent authority to access ERROR:0");
+        requireGov();
         _;
     }
 
     //internal
-    function requireGovAddress() internal view returns (bool) {
+
+    function isSenderGovAddress() internal view returns (bool) {
         return (msg.sender == govAddress);
+    }
+
+    function requireGov() internal view {
+        require(isSenderGovAddress(), "You havent authority to access ERROR:0");
     }
 
     function setUserData(bytes calldata userInfo, address userAddress) internal {
@@ -45,7 +50,7 @@ contract Controllar {
 
     //external
     function getUserRole() external view returns (Role) {
-        if(requireGovAddress()){
+        if(isSenderGovAddress()){
            return Role.Gov;
         }
         else{
@@ -58,6 +63,11 @@ contract Controllar {
         Role role,
         bytes calldata userInfo
     ) external onlySecondaryAuth {
+
+        if(role == Role.Admin){
+            requireGov();
+        }
+        require(role != Role.Gov,"You havent authority to add this role: Error:2");
 
         userRoleMap[newUserAddress] = role;
         setUserData(userInfo,newUserAddress);
