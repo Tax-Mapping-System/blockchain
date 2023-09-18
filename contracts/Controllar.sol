@@ -10,10 +10,16 @@ enum Role {
 }
 
 contract Controllar {
-    address private immutable govAddress = msg.sender;
+    address private immutable govAddress;
 
     mapping(address => Role) private userRoleMap; //users rols
     mapping(address => bytes) private userInformationMap; //duble encripted byte converted object string
+
+
+    constructor(){
+        govAddress =  msg.sender;
+        userRoleMap[msg.sender]= Role.Gov ;
+    }
 
     //events
     event addNewUserAddress(address indexed user, Role indexed role);
@@ -50,12 +56,9 @@ contract Controllar {
 
     //external
     function getUserRole() external view returns (Role) {
-        if(isSenderGovAddress()){
-           return Role.Gov;
-        }
-        else{
-             return userRoleMap[msg.sender];
-        }
+       
+        return userRoleMap[msg.sender];
+        
     }
 
     function setUserRole(
