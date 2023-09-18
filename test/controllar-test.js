@@ -7,6 +7,7 @@ const [NotRegisterd, Admin, User, ProjectOwner, Gov] = [0, 1, 2, 3, 4];
 
 contract("Manager Contract", (accounts) => {
   const govAddress = accounts[0];
+  const testUserInfo = "{userName:TestName, NIC:TestNIC";
 
   let contract;
 
@@ -20,19 +21,24 @@ contract("Manager Contract", (accounts) => {
     expect(expected).to.have.all.members(given); // passes
   };
 
-  const addNewUser = (newUser, role, from = govAddress) => {
-    return contract.setUserRole(newUser, role, {
+  const addNewUser = (newUser, role, userInfo, from = govAddress) => {
+    return contract.setUserRole(newUser, role, userInfo, {
       from: from,
     });
+  };
+
+  const getBytes = (stringData) => {
+    return Buffer.from(stringData, "utf8");
   };
 
   //test
 
   describe("setUserRole", () => {
+    // all the testing done without the ecriptions
     it("should set user with gov role", async () => {
       const newUser = accounts[1];
 
-      const result = await addNewUser(newUser, Admin);
+      const result = await addNewUser(newUser, Admin, getBytes(testUserInfo));
 
       const emitedEvents = result.logs.map((e) => e.event);
 
@@ -44,9 +50,16 @@ contract("Manager Contract", (accounts) => {
       const newUser = accounts[2];
 
       //maeke adminAddress addmin
-      await truffleAssert.passes(addNewUser(adminAddress, Admin));
+      await truffleAssert.passes(
+        addNewUser(adminAddress, Admin, getBytes(testUserInfo))
+      );
 
-      result = await addNewUser(newUser, User, adminAddress);
+      result = await addNewUser(
+        newUser,
+        User,
+        getBytes(testUserInfo),
+        adminAddress
+      );
 
       const emitedEvents = result.logs.map((e) => e.event);
 
@@ -58,22 +71,45 @@ contract("Manager Contract", (accounts) => {
       const newUser = accounts[2];
 
       await truffleAssert.reverts(
-        addNewUser(newUser, User, fakeUser),
+        addNewUser(newUser, User, getBytes(testUserInfo), fakeUser),
         "You havent authority to access ERROR:1"
       );
     });
     it("can not set Project owner role without secondary auth", async () => {
-      throw new Error("Not completed");
+      const fakeUser = accounts[1];
+      const newUser = accounts[2];
+
+      await truffleAssert.reverts(
+        addNewUser(newUser, ProjectOwner, getBytes(testUserInfo), fakeUser),
+        "You havent authority to access ERROR:1"
+      );
+    });
+
+    it("can not set Gov role ", async () => {
+      const newUser = accounts[2];
+
+      await truffleAssert.reverts(
+        addNewUser(newUser, Gov, getBytes(testUserInfo)),
+        "You havent authority to add this role: Error:2"
+      );
     });
 
     it("can not set Admin role without gov auth", async () => {
-      throw new Error("Not completed");
+      const newUser = accounts[1];
+      const adminUser = accounts[2];
+
+      await truffleAssert.passes(
+        addNewUser(adminUser, Admin, getBytes(testUserInfo))
+      );
+
+      await truffleAssert.reverts(
+        addNewUser(newUser, Admin, getBytes(testUserInfo), adminUser),
+        "You havent authority to access ERROR:0"
+      );
     });
     it("can not set new role without user info", async () => {
-      throw new Error("Not completed");
-    });
-    it("can not set another GOV auth", async () => {
-      throw new Error("Not completed");
+      const adminUser = accounts[2];
+      await truffleAssert.fails(addNewUser(adminUser, Admin));
     });
   });
 
@@ -81,7 +117,9 @@ contract("Manager Contract", (accounts) => {
     it("should return user role", async () => {
       const newUser = accounts[1];
 
-      await truffleAssert.passes(addNewUser(newUser, User));
+      await truffleAssert.passes(
+        addNewUser(newUser, User, getBytes(testUserInfo))
+      );
 
       const result = await contract.getUserRole({ from: newUser });
 
@@ -103,7 +141,9 @@ contract("Manager Contract", (accounts) => {
     it("should return Admin role", async () => {
       const newUser = accounts[1];
 
-      await truffleAssert.passes(addNewUser(newUser, Admin));
+      await truffleAssert.passes(
+        addNewUser(newUser, Admin, getBytes(testUserInfo))
+      );
 
       const result = await contract.getUserRole({ from: newUser });
 
@@ -112,7 +152,9 @@ contract("Manager Contract", (accounts) => {
     it("should return Project owner role", async () => {
       const newUser = accounts[1];
 
-      await truffleAssert.passes(addNewUser(newUser, ProjectOwner));
+      await truffleAssert.passes(
+        addNewUser(newUser, ProjectOwner, getBytes(testUserInfo))
+      );
 
       const result = await contract.getUserRole({ from: newUser });
 
