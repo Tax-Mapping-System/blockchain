@@ -176,7 +176,7 @@ contract("Manager Contract", (accounts) => {
         from: newUser,
       });
 
-      expect(hexToBuffer(userData).toString()).to.be.eql(
+      expect(hexToBuffer(userData.userInfo).toString()).to.be.eql(
         userDataBytes.toString()
       );
     });
@@ -200,7 +200,7 @@ contract("Manager Contract", (accounts) => {
             from: a,
           })
           .then((userData) => {
-            expect(hexToBuffer(userData).toString()).to.be.eql(
+            expect(hexToBuffer(userData.userInfo).toString()).to.be.eql(
               userDataBytes.toString()
             );
           });
