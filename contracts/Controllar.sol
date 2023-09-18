@@ -54,6 +54,10 @@ contract Controllar {
         userInformationMap[userAddress] = userInfo;
     }
 
+    function getUserData(address userAddress) internal view returns(bytes memory){
+        return userInformationMap[userAddress];
+    }
+
     //external
     function getUserRole() external view returns (Role) {
        
@@ -79,6 +83,10 @@ contract Controllar {
     }
 
     function getMyUserData() external view returns(bytes memory){
-        return userInformationMap[msg.sender];
+        return getUserData(msg.sender);
+    }
+
+    function getIndividualUserData(address userAddress) external view onlySecondaryAuth returns (bytes memory){
+        return getUserData(userAddress);
     }
 }

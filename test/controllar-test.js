@@ -181,4 +181,53 @@ contract("Manager Contract", (accounts) => {
       );
     });
   });
+
+  describe("getIndividualUserData", () => {
+    it("can get user data", async () => {
+      const newUser = accounts[2];
+      const adminAddress = accounts[3];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(newUser, User, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(adminAddress, Admin, userDataBytes)
+      );
+
+      [govAddress, adminAddress].map((a) => {
+        // const userData = ;
+        contract
+          .getIndividualUserData(newUser, {
+            from: a,
+          })
+          .then((userData) => {
+            expect(hexToBuffer(userData).toString()).to.be.eql(
+              userDataBytes.toString()
+            );
+          });
+      });
+    });
+    it("can not get user data without secondary auth", async () => {
+      const newUser = accounts[2];
+      const fakeUser = accounts[3];
+      const user = accounts[4];
+      const projectOwner = accounts[5];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(newUser, User, userDataBytes));
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+
+      [fakeUser, user, projectOwner].map(async (a) => {
+        await truffleAssert.reverts(
+          contract.getIndividualUserData(newUser, {
+            from: a,
+          }),
+          "You havent authority to access ERROR:1"
+        );
+      });
+    });
+  });
 });
