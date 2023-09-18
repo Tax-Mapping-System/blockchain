@@ -77,4 +77,8 @@ contract Controllar {
 
         emit addNewUserAddress(newUserAddress, role);
     }
+
+    function getMyUserData() external view returns(bytes memory){
+        return userInformationMap[msg.sender];
+    }
 }

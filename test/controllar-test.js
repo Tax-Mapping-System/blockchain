@@ -30,6 +30,9 @@ contract("Manager Contract", (accounts) => {
   const getBytes = (stringData) => {
     return Buffer.from(stringData, "utf8");
   };
+  const hexToBuffer = (hexVal) => {
+    return Buffer.from(hexVal.slice(2), "hex");
+  };
 
   //test
 
@@ -159,6 +162,23 @@ contract("Manager Contract", (accounts) => {
       const result = await contract.getUserRole({ from: newUser });
 
       expect(parseInt(result)).to.be.eql(ProjectOwner);
+    });
+  });
+
+  describe("getMyUserData", () => {
+    it("can get user data", async () => {
+      const newUser = accounts[2];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(newUser, User, userDataBytes));
+
+      const userData = await contract.getMyUserData({
+        from: newUser,
+      });
+
+      expect(hexToBuffer(userData).toString()).to.be.eql(
+        userDataBytes.toString()
+      );
     });
   });
 });
