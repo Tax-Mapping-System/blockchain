@@ -45,7 +45,7 @@ contract("Manager Contract", (accounts) => {
 
       const emitedEvents = result.logs.map((e) => e.event);
 
-      assertEventArray(["addNewUserAddress"], emitedEvents);
+      assertEventArray(["registerNewUserAddress"], emitedEvents);
     });
 
     it("should set user with Admin role", async () => {
@@ -66,7 +66,7 @@ contract("Manager Contract", (accounts) => {
 
       const emitedEvents = result.logs.map((e) => e.event);
 
-      assertEventArray(["addNewUserAddress"], emitedEvents);
+      assertEventArray(["registerNewUserAddress"], emitedEvents);
     });
 
     it("can not set user role without secondary auth", async () => {

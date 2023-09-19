@@ -72,7 +72,7 @@ contract Controllar is IController {
         userRoleMap[newUserAddress] = role;
         setUserData(userInfo,newUserAddress);
 
-        emit addNewUserAddress(newUserAddress, role);
+        emit registerNewUserAddress(newUserAddress, role);
     }
 
     function getMyUserData() external view returns(UserData memory){

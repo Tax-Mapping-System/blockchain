@@ -15,5 +15,5 @@ interface IController {
     }
 
     //events
-    event addNewUserAddress(address indexed user, Role indexed role);
+    event registerNewUserAddress(address indexed user, Role indexed role);
 }
