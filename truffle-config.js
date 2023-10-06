@@ -18,10 +18,13 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+require("dotenv").config();
+const fs = require("fs");
+
+const HDWalletProvider = require("@truffle/hdwallet-provider");
+
+const mnemonic = fs.readFileSync(".secret").toString().trim();
+const infura_api_key = process.env.INFURA_API_KEY;
 
 module.exports = {
   /**
@@ -45,6 +48,36 @@ module.exports = {
       host: "127.0.0.1", // Localhost (default: none)
       port: 7545, // Standard Ethereum port (default: none)
       network_id: "*", // Any network (default: none)
+    },
+    // sepolia: {
+    //   provider: () =>
+    //     new HDWalletProvider(
+    //       mnemonic,
+    //       `https://sepolia.infura.io/v3/${infura_api_key}`
+    //     ),
+    //   network_id: "11155111",
+    //   networkCheckTimeout: 60000,
+    //   gas: 4465030,
+    // },
+    // goerli: {
+    //   provider: () =>
+    //     new HDWalletProvider(
+    //       mnemonic,
+    //       `https://goerli.infura.io/v3/${infura_api_key}`
+    //     ),
+    //   network_id: 5,
+    //   networkCheckTimeout: 60000,
+    //   gas: 4465030,
+    // },
+    mumbai: {
+      provider: () =>
+        new HDWalletProvider(
+          mnemonic,
+          `https://polygon-mumbai.infura.io/v3/${infura_api_key}`
+        ),
+      network_id: 80001,
+      networkCheckTimeout: 60000,
+      gas: 5500000,
     },
     // Another network with more advanced options...
     // advanced: {
