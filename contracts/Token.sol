@@ -17,7 +17,7 @@ contract Token is IToken, Auth{
 
 
     //external 
-    function getImutableData () external view returns(bytes memory){
+    function getImutableData() external view returns(bytes memory){
         return immutableData;
     }
  
