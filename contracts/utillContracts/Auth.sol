@@ -10,4 +10,9 @@ contract Auth {
         govAddress = msg.sender;
     }
 
+
+    function getProjectOwner() external view returns(address){
+        return ProjectOwner;
+    }
+
 }
