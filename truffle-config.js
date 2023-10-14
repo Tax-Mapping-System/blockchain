@@ -18,13 +18,13 @@
  *
  */
 
-require("dotenv").config();
-const fs = require("fs");
+// require("dotenv").config();
+// const fs = require("fs");
 
-const HDWalletProvider = require("@truffle/hdwallet-provider");
+// const HDWalletProvider = require("@truffle/hdwallet-provider");
 
-const mnemonic = fs.readFileSync(".secret").toString().trim();
-const infura_api_key = process.env.INFURA_API_KEY;
+// const mnemonic = fs.readFileSync(".secret").toString().trim();
+// const infura_api_key = process.env.INFURA_API_KEY;
 
 module.exports = {
   /**
@@ -69,16 +69,16 @@ module.exports = {
     //   networkCheckTimeout: 60000,
     //   gas: 4465030,
     // },
-    mumbai: {
-      provider: () =>
-        new HDWalletProvider(
-          mnemonic,
-          `https://polygon-mumbai.infura.io/v3/${infura_api_key}`
-        ),
-      network_id: 80001,
-      networkCheckTimeout: 60000,
-      gas: 5500000,
-    },
+    // mumbai: {
+    //   provider: () =>
+    //     new HDWalletProvider(
+    //       mnemonic,
+    //       `https://polygon-mumbai.infura.io/v3/${infura_api_key}`
+    //     ),
+    //   network_id: 80001,
+    //   networkCheckTimeout: 60000,
+    //   gas: 5500000,
+    // },
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
