@@ -194,7 +194,6 @@ contract("Manager Contract", (accounts) => {
       );
 
       [govAddress, adminAddress].map((a) => {
-        // const userData = ;
         contract
           .getIndividualUserData(newUser, {
             from: a,
