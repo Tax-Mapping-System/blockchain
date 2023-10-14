@@ -3,7 +3,7 @@ const truffleAssert = require("truffle-assertions");
 const chai = require("chai");
 const expect = chai.expect;
 
-contract("Manager Contract", (accounts) => {
+contract("Token Contract", (accounts) => {
   const govAddress = accounts[0];
 
   const projectImutableData = "{location:colombo,start_year:2021}";
@@ -42,5 +42,5 @@ contract("Manager Contract", (accounts) => {
     });
   });
 
-  describe("getProjectOwner", () => {});
+  // describe("getProjectOwner", () => {});
 });
