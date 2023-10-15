@@ -45,7 +45,6 @@ contract Controllar is IController {
             userRoleMap[msg.sender] != Role.NotRegisterd,
             "You havent registerd yet ERROR:3"
         );
-
         _;
     }
 
