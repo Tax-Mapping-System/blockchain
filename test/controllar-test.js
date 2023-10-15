@@ -408,4 +408,13 @@ contract("Manager Contract", (accounts) => {
       });
     });
   });
+  describe("getProjectById", () => {
+    it("can get project contract address by id", async () => {
+      await createNewProjectToken();
+
+      const result = await contract.getProjectById(0, { from: govAddress });
+
+      expect(result).to.be.not.null;
+    });
+  });
 });
