@@ -9,6 +9,9 @@ contract("Manager Contract", (accounts) => {
   const govAddress = accounts[0];
   const testUserInfo = "{userName:TestName, NIC:TestNIC";
 
+  const projectImutableData = "{location:colombo,start_year:2021}";
+  const projectName = "Nelum kuluna";
+
   let contract;
 
   beforeEach(async () => {
@@ -25,6 +28,18 @@ contract("Manager Contract", (accounts) => {
     return contract.setUserRole(newUser, role, userInfo, {
       from: from,
     });
+  };
+
+  const createNewProjectToken = (
+    testProjectImutableData = projectImutableData,
+    testProjectName = projectName,
+    from = govAddress
+  ) => {
+    return contract.createNewProject(
+      getBytes(testProjectImutableData),
+      testProjectName,
+      { from: from }
+    );
   };
 
   const getBytes = (stringData) => {
@@ -224,6 +239,47 @@ contract("Manager Contract", (accounts) => {
           contract.getIndividualUserData(newUser, {
             from: a,
           }),
+          "You havent authority to access ERROR:1"
+        );
+      });
+    });
+  });
+
+  describe("createNewProject", () => {
+    it("can create a new project with secondary auth token", async () => {
+      const admin = accounts[2];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
+
+      [admin, govAddress].map((a) => {
+        contract
+          .createNewProject(getBytes(projectImutableData), projectName, {
+            from: a,
+          })
+          .then((result) => {
+            const emitedEvents = result.logs.map((e) => e.event);
+
+            assertEventArray(["createNewProjectToken"], emitedEvents);
+          });
+      });
+    });
+
+    it("can create a new project only secondary auth", async () => {
+      const fakeUser = accounts[2];
+      const user = accounts[3];
+      const projectOwner = accounts[4];
+
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+
+      [fakeUser, user, projectOwner].map(async (a) => {
+        await truffleAssert.reverts(
+          createNewProjectToken(projectImutableData, projectName, a),
           "You havent authority to access ERROR:1"
         );
       });
