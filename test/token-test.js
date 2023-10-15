@@ -7,13 +7,18 @@ contract("Token Contract", (accounts) => {
   const govAddress = accounts[0];
 
   const projectImutableData = "{location:colombo,start_year:2021}";
+  const projectName = "Nelum kuluna";
 
   let contract;
 
   beforeEach(async () => {
-    contract = await tokenContract.new(getBytes(projectImutableData), {
-      from: govAddress,
-    });
+    contract = await tokenContract.new(
+      getBytes(projectImutableData),
+      projectName,
+      {
+        from: govAddress,
+      }
+    );
   });
 
   const assertEventArray = (expected, given) => {
@@ -39,6 +44,14 @@ contract("Token Contract", (accounts) => {
       const result = await contract.getImutableData();
 
       expect(hexToBuffer(result).toString()).to.be.eql(projectImutableData);
+    });
+  });
+
+  describe("getProjectName", () => {
+    it("can get project name", async () => {
+      const result = await contract.getProjectName();
+
+      expect(result).to.be.eql(projectName);
     });
   });
 
