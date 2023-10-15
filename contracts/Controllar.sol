@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "./interface/IController.sol";
+import "./Token.sol";
 
 
 
@@ -13,10 +14,14 @@ contract Controllar is IController {
     mapping(address => Role) private userRoleMap; //users rols
     mapping(address => UserData) private userInformationMap; //duble encripted byte converted object string
 
+    mapping(uint256 => address) private projectMap; // store project token address with unique id
+    uint256 private availableProjectId; //store next available projectId
+
 
     constructor(){
         govAddress =  msg.sender;
         userRoleMap[msg.sender]= Role.Gov ;
+        availableProjectId = 0;
     }
 
     //modifires
@@ -81,5 +86,16 @@ contract Controllar is IController {
 
     function getIndividualUserData(address userAddress) external view onlySecondaryAuth returns (UserData memory){
         return getUserData(userAddress);
+    }
+
+    function createNewProject(bytes memory projectImutableData, string memory projectName) external onlySecondaryAuth {
+
+        address newProjectAddress = address(new Token(projectImutableData,projectName));
+
+        projectMap[availableProjectId] = newProjectAddress;
+        
+        emit createNewProjectToken(availableProjectId,newProjectAddress, projectName);
+        
+        availableProjectId++;
     }
 }
