@@ -16,5 +16,6 @@ interface IController {
 
     //events
     event registerNewUserAddress(address indexed user, Role indexed role);
-    event createNewProjectToken (uint256 indexed projectId, address tokenAddress, string projectName);
+    event createNewProjectToken (uint256 indexed projectId, address indexed tokenAddress, string projectName);
+    event taxPayment (address indexed user, uint16 indexed year, uint payment);
 }
