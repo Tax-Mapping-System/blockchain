@@ -122,4 +122,8 @@ contract Controllar is IController {
     function getIndividualUserTaxPaymentDataInYear( address user, uint16 year) external view onlySecondaryAuth returns(uint){
         return userPaymentsMap[user][year];
     }
+
+    function getProjectById(uint256 id) external view returns(address){
+        return projectMap[id];
+    }
 }
