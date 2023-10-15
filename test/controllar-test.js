@@ -285,4 +285,127 @@ contract("Manager Contract", (accounts) => {
       });
     });
   });
+
+  describe("payTax", () => {
+    it("can pay tax", async () => {
+      const user = accounts[1];
+      const userDataBytes = getBytes(testUserInfo);
+      const value = 1000000;
+      const year = 2023;
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+
+      const result = await contract.payTax(year, {
+        from: user,
+        value: value,
+      });
+
+      const emitedEvents = result.logs.map((e) => e.event);
+
+      assertEventArray(["taxPayment"], emitedEvents);
+    });
+
+    it("can only pay tax registerd users", async () => {
+      const user = accounts[1];
+      const value = 1000000;
+      const year = 2023;
+
+      await truffleAssert.reverts(
+        contract.payTax(year, { from: user, value: value }),
+        "You havent registerd yet ERROR:3"
+      );
+    });
+  });
+
+  describe("getMyTaxPaymentDataInYear", () => {
+    it("can get user tax payment in to year", async () => {
+      const user = accounts[1];
+      const userDataBytes = getBytes(testUserInfo);
+      const value = 1000000;
+      const year = 2023;
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+
+      await contract.payTax(year, { from: user, value: value });
+
+      const result = await contract.getMyTaxPaymentDataInYear(year, {
+        from: user,
+      });
+
+      expect(parseInt(result)).to.be.eql(value);
+    });
+  });
+
+  describe("getIndividualUserTaxPaymentDataInYear", () => {
+    it("can get individual users tax payment in year", async () => {
+      const user = accounts[1];
+      const userDataBytes = getBytes(testUserInfo);
+      const year = 2023;
+      const value = 1000000;
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+
+      await contract.payTax(year, { from: user, value: value });
+
+      const result = await contract.getIndividualUserTaxPaymentDataInYear(
+        user,
+        year,
+        {
+          from: govAddress,
+        }
+      );
+
+      expect(parseInt(result)).to.be.eql(value);
+    });
+    it("can get individual users tax payment in year only secondary auth", async () => {
+      const user = accounts[2];
+      const userDataBytes = getBytes(testUserInfo);
+      const admin = accounts[3];
+      const fakeUser = accounts[4];
+
+      const year = 2023;
+      const value = 1000000;
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+      await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
+
+      await contract.payTax(year, { from: user, value: value });
+
+      [admin, govAddress].map((a) => {
+        contract
+          .getIndividualUserTaxPaymentDataInYear(user, year, {
+            from: a,
+          })
+          .then((result) => {
+            expect(parseInt(result)).to.be.eql(value);
+          });
+      });
+    });
+    it("can not get individual data without secondary auth", async () => {
+      const user = accounts[2];
+      const fakeUser = accounts[3];
+      const projectOwner = accounts[5];
+
+      const userDataBytes = getBytes(testUserInfo);
+
+      const year = 2023;
+      const value = 1000000;
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+
+      await contract.payTax(year, { from: user, value: value });
+
+      [projectOwner, user, fakeUser].map(async (a) => {
+        await truffleAssert.reverts(
+          contract.getIndividualUserTaxPaymentDataInYear(user, year, {
+            from: fakeUser,
+          }),
+          "You havent authority to access ERROR:1"
+        );
+      });
+    });
+  });
 });
