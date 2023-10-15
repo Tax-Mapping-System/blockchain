@@ -17,6 +17,8 @@ contract Controllar is IController {
     mapping(uint256 => address) private projectMap; // store project token address with unique id
     uint256 private availableProjectId; //store next available projectId
 
+    mapping(address => mapping(uint16 => uint256)) private userPaymentsMap; // record user payments (useraddress=>(year=>moneyTotal))
+
 
     constructor(){
         govAddress =  msg.sender;
@@ -34,6 +36,14 @@ contract Controllar is IController {
         require(
             isSenderGovAddress() || userRoleMap[msg.sender] == Role.Admin,
             "You havent authority to access ERROR:1"
+        );
+
+        _;
+    }
+    modifier onlyRegisterdUser() {
+        require(
+            userRoleMap[msg.sender] != Role.NotRegisterd,
+            "You havent registerd yet ERROR:3"
         );
 
         _;
@@ -97,5 +107,20 @@ contract Controllar is IController {
         emit createNewProjectToken(availableProjectId,newProjectAddress, projectName);
         
         availableProjectId++;
+    }
+
+    function payTax(uint16 year) external payable onlyRegisterdUser{
+        
+        userPaymentsMap[msg.sender][year] += msg.value;
+        
+        emit taxPayment(msg.sender, year, msg.value);
+    } 
+
+    function getMyTaxPaymentDataInYear(uint16 year) external view returns(uint){
+        return userPaymentsMap[msg.sender][year];
+    }
+
+    function getIndividualUserTaxPaymentDataInYear( address user, uint16 year) external view onlySecondaryAuth returns(uint){
+        return userPaymentsMap[user][year];
     }
 }
