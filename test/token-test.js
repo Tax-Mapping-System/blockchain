@@ -3,6 +3,8 @@ const truffleAssert = require("truffle-assertions");
 const chai = require("chai");
 const expect = chai.expect;
 
+const [ReciverdMoney, SendMoneyRequest, MoneyWithdrawal] = [0, 1, 2];
+
 contract("Token Contract", (accounts) => {
   const govAddress = accounts[0];
 
@@ -58,4 +60,13 @@ contract("Token Contract", (accounts) => {
   });
 
   // describe("getProjectOwner", () => {});
+
+  describe("moneyRequest", () => {
+    it("can not send money request without auth", async () => {
+      await truffleAssert.reverts(
+        contract.moneyRequest(100, { from: accounts[1] }),
+        "You havent authority to access ERROR:1"
+      );
+    });
+  });
 });
