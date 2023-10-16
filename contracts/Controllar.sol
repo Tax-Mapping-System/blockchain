@@ -113,7 +113,7 @@ contract Controllar is IController {
 
     function createNewProject(bytes memory projectImutableData, string memory projectName) external onlySecondaryAuth {
 
-        address newProjectAddress = address(new Token(projectImutableData,projectName));
+        address newProjectAddress = address(new Token(projectImutableData,projectName, availableProjectId));
 
         projectMap[availableProjectId] = newProjectAddress;
         projectIsTransactionAvailable[availableProjectId] = true;

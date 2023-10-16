@@ -8,12 +8,14 @@ contract Token is IToken, Auth{
 
     bytes private immutableData;
     string private projectName;
+    uint256 public immutable id;
 
 
-    constructor(bytes memory projectImmutableData, string memory name)Auth()
+    constructor(bytes memory projectImmutableData, string memory name, uint256 tokenId)Auth()
     {
         immutableData = projectImmutableData;
         projectName = name;
+        id = tokenId;
     }
 
 
