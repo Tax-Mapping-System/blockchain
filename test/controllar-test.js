@@ -417,4 +417,57 @@ contract("Manager Contract", (accounts) => {
       expect(result).to.be.not.null;
     });
   });
+
+  describe("changeTokenMoneyRequestingState", () => {
+    it("can change token money requesting state", async () => {
+      await createNewProjectToken();
+
+      const result = await contract.changeTokenMoneyRequestingState(0, true, {
+        from: govAddress,
+      });
+
+      const emitedEvents = result.logs.map((e) => e.event);
+
+      assertEventArray(["changeTokenMoneyRequestingStateEvent"], emitedEvents);
+    });
+
+    it("can not change token money requesting state without secondary auth", async () => {
+      const user = accounts[1];
+      const projectOwner = accounts[2];
+      const fakeUser = accounts[3];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+
+      await createNewProjectToken();
+
+      [user, projectOwner, fakeUser].map(async (a) => {
+        await truffleAssert.reverts(
+          contract.changeTokenMoneyRequestingState(0, true, {
+            from: a,
+          }),
+          "You havent authority to access ERROR:1"
+        );
+      });
+    });
+    it("can change token money requesting state with secondary auth", async () => {
+      const admin = accounts[1];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
+
+      await createNewProjectToken();
+
+      [admin, govAddress].map(async (a) => {
+        await truffleAssert.passes(
+          contract.changeTokenMoneyRequestingState(0, true, {
+            from: a,
+          })
+        );
+      });
+    });
+  });
 });
