@@ -44,7 +44,7 @@ jobs:
       run: sleep 5
 
     - name: Run Truffle Test with CI=true for Codechecks  
-      run: truffle test test
+      run: truffle test
 
     # - name: Run Truffle Test for controller contract with CI=true for Codechecks  
     #   run: truffle test test/controllar-test.js
