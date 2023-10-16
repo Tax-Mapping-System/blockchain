@@ -15,15 +15,20 @@ contract Controllar is IController {
     mapping(address => UserData) private userInformationMap; //duble encripted byte converted object string
 
     mapping(uint256 => address) private projectMap; // store project token address with unique id
+    mapping(address => uint256) private addressToIdMap; //token address => id
+    mapping(uint256 => bool) private projectIsTransactionAvailable; // contract address => bool. this check if the contract can request money. use for security
     uint256 private availableProjectId; //store next available projectId
 
     mapping(address => mapping(uint16 => uint256)) private userPaymentsMap; // record user payments (useraddress=>(year=>moneyTotal))
+
+    uint256 private availableMoneyRequestId; //help to tract money requests
 
 
     constructor(){
         govAddress =  msg.sender;
         userRoleMap[msg.sender]= Role.Gov ;
         availableProjectId = 0;
+        availableMoneyRequestId = 0;
     }
 
     //modifires
@@ -44,6 +49,15 @@ contract Controllar is IController {
         require(
             userRoleMap[msg.sender] != Role.NotRegisterd,
             "You havent registerd yet ERROR:3"
+        );
+        _;
+    }
+
+    modifier onlyTransactionAvailableProjectToken() {
+        require(
+            
+            projectIsTransactionAvailable[addressToIdMap[msg.sender]],
+            "contract meney request blocked ERROR:4"
         );
         _;
     }
@@ -102,6 +116,8 @@ contract Controllar is IController {
         address newProjectAddress = address(new Token(projectImutableData,projectName));
 
         projectMap[availableProjectId] = newProjectAddress;
+        projectIsTransactionAvailable[availableProjectId] = true;
+        addressToIdMap[newProjectAddress] = availableProjectId;
         
         emit createNewProjectToken(availableProjectId,newProjectAddress, projectName);
         
@@ -125,5 +141,15 @@ contract Controllar is IController {
 
     function getProjectById(uint256 id) external view returns(address){
         return projectMap[id];
+    }
+
+    function changeTokenMoneyRequestingState(uint256 tokenId, bool state) external onlySecondaryAuth {
+        projectIsTransactionAvailable[tokenId] = state;
+        emit changeTokenMoneyRequestingStateEvent( tokenId, state);
+    }
+
+    function projectMoneyRequest(uint256 moneyRequest, uint256 tokenId) external onlyTransactionAvailableProjectToken {
+        emit projectMoneyRequestEvent(msg.sender,tokenId,availableMoneyRequestId, moneyRequest);
+        availableMoneyRequestId++;
     }
 }
