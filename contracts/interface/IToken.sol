@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-enum ProjectEventType {
+enum ProjectMoneyEventType {
     ReciverdMoney,
     SendMoneyRequest,
     MoneyWithdrawal
@@ -10,5 +10,5 @@ enum ProjectEventType {
 interface IToken {
 
     //events
-    event ProjectEvent(ProjectEventType indexed eventType);
+    event ProjectEvent(ProjectMoneyEventType indexed eventType, uint256 money);
 }
