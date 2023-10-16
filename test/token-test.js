@@ -8,6 +8,7 @@ contract("Token Contract", (accounts) => {
 
   const projectImutableData = "{location:colombo,start_year:2021}";
   const projectName = "Nelum kuluna";
+  const tokenId = 0;
 
   let contract;
 
@@ -15,6 +16,7 @@ contract("Token Contract", (accounts) => {
     contract = await tokenContract.new(
       getBytes(projectImutableData),
       projectName,
+      tokenId,
       {
         from: govAddress,
       }
