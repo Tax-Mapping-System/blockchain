@@ -64,7 +64,7 @@ contract("Token Contract", (accounts) => {
   describe("moneyRequest", () => {
     it("can not send money request without auth", async () => {
       await truffleAssert.reverts(
-        contract.moneyRequest(100, { from: accounts[1] }),
+        contract.moneyRequest(100, "for buy light", { from: accounts[1] }),
         "You havent authority to access ERROR:1"
       );
     });
