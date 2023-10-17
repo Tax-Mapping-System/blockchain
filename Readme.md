@@ -7,3 +7,4 @@ error codes
 4: contract blocked for transaction
 5: withdrawal amount incorrect
 6: insuffeciant contract eth balance
+7: Invalid project owner address
