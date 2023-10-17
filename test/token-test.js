@@ -36,6 +36,8 @@ contract("Token Contract", (accounts) => {
     return Buffer.from(hexVal.slice(2), "hex");
   };
 
+  //tests
+
   describe("govAddress", () => {
     it("can get gov address", async () => {
       const result = await contract.govAddress();
@@ -62,10 +64,41 @@ contract("Token Contract", (accounts) => {
   // describe("getProjectOwner", () => {});
 
   describe("moneyRequest", () => {
+    // can not handle othere test cases
+
     it("can not send money request without auth", async () => {
       await truffleAssert.reverts(
         contract.moneyRequest(100, "for buy light", { from: accounts[1] }),
         "You havent authority to access ERROR:1"
+      );
+    });
+  });
+
+  describe("withdrawMoney", () => {
+    it("can not withdraw money without token aith", async () => {
+      const fakeUser = accounts[1];
+      const money = 1000;
+      const reason = "buy bulbs for project";
+
+      await truffleAssert.reverts(
+        contract.withdrawMoney(money, reason, { from: fakeUser }),
+        "You havent authority to access ERROR:1"
+      );
+    });
+    it("can not withdraw money without correct mony", async () => {
+      const money = 0;
+      const reason = "buy bulbs for project";
+      await truffleAssert.reverts(
+        contract.withdrawMoney(money, reason, { from: govAddress }),
+        "Amount must be greater than 0 Error:5"
+      );
+    });
+    it("can not withdraw money without contract insufficient mony", async () => {
+      const money = 1000;
+      const reason = "buy bulbs for project";
+      await truffleAssert.reverts(
+        contract.withdrawMoney(money, reason, { from: govAddress }),
+        "Insufficient funds in the contract Error:6"
       );
     });
   });
