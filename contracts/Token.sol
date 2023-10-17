@@ -33,10 +33,10 @@ contract Token is IToken, Auth{
         return immutableData;
     }
 
-    function moneyRequest(uint256 money) external onlyProjectAuth {
-        IController(controllerContractAddress).projectMoneyRequest(money, id);
+    function moneyRequest(uint256 money, string memory reason) external onlyProjectAuth {
+        IController(controllerContractAddress).projectMoneyRequest(money, id, reason);
 
-        emit ProjectEvent(ProjectMoneyEventType.SendMoneyRequest,money);
+        emit ProjectEvent(ProjectMoneyEventType.SendMoneyRequest,money, reason);
     }
  
 }
