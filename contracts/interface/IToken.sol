@@ -10,5 +10,5 @@ enum ProjectMoneyEventType {
 interface IToken {
 
     //events
-    event ProjectEvent(ProjectMoneyEventType indexed eventType, uint256 money);
+    event ProjectEvent(ProjectMoneyEventType indexed eventType, uint256 money, string reason);
 }
