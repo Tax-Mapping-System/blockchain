@@ -148,8 +148,8 @@ contract Controllar is IController {
         emit changeTokenMoneyRequestingStateEvent( tokenId, state);
     }
 
-    function projectMoneyRequest(uint256 moneyRequest, uint256 tokenId) external override onlyTransactionAvailableProjectToken {
-        emit projectMoneyRequestEvent(msg.sender,tokenId,availableMoneyRequestId, moneyRequest);
+    function projectMoneyRequest(uint256 moneyRequest, uint256 tokenId,string memory reason) external override onlyTransactionAvailableProjectToken {
+        emit projectMoneyRequestEvent(msg.sender,tokenId,availableMoneyRequestId, moneyRequest,reason);
         availableMoneyRequestId++;
     }
 }
