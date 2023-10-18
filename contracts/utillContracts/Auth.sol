@@ -6,7 +6,8 @@ contract Auth {
     address internal ProjectOwner;
 
 
-    constructor(){
+    constructor(address projectOwnerAddress){
+        ProjectOwner = projectOwnerAddress;
         govAddress = msg.sender;
     }
 
