@@ -62,20 +62,25 @@ contract Controllar is IController {
         _;
     }
 
-    //internal
-    function isSenderGovAddress() internal view returns (bool) {
+    modifier onlyValidProjectOwner(address projectOwner){
+        require(userRoleMap[projectOwner] == Role.ProjectOwner,"invalid project owner Error:7");
+        _;
+    }
+
+    //private
+    function isSenderGovAddress() private view returns (bool) {
         return (msg.sender == govAddress);
     }
 
-    function requireGov() internal view {
+    function requireGov() private view {
         require(isSenderGovAddress(), "You havent authority to access ERROR:0");
     }
 
-    function setUserData(bytes calldata userInfo, address userAddress) internal {
+    function setUserData(bytes calldata userInfo, address userAddress) private {
         userInformationMap[userAddress].userInfo = userInfo;
     }
 
-    function getUserData(address userAddress) internal view returns(UserData memory){
+    function getUserData(address userAddress) private view returns(UserData memory){
         return userInformationMap[userAddress];
     }
 
@@ -111,9 +116,9 @@ contract Controllar is IController {
         return getUserData(userAddress);
     }
 
-    function createNewProject(bytes memory projectImutableData, string memory projectName) external onlySecondaryAuth {
+    function createNewProject(bytes memory projectImutableData, string memory projectName, address projectOwner) external onlySecondaryAuth onlyValidProjectOwner(projectOwner){
 
-        address newProjectAddress = address(new Token(projectImutableData,projectName, availableProjectId));
+        address newProjectAddress = address(new Token(projectImutableData,projectName, availableProjectId, projectOwner));
 
         projectMap[availableProjectId] = newProjectAddress;
         projectIsTransactionAvailable[availableProjectId] = true;
