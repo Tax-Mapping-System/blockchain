@@ -15,7 +15,7 @@ contract Token is IToken, Auth{
     address private immutable controllerContractAddress = msg.sender;
 
 
-    constructor(bytes memory projectImmutableData, string memory name, uint256 tokenId)Auth()
+    constructor(bytes memory projectImmutableData, string memory name, uint256 tokenId, address projectOwner)Auth(projectOwner)
     {
         immutableData = projectImmutableData;
         projectName = name;
