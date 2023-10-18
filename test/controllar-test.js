@@ -31,6 +31,7 @@ contract("Manager Contract", (accounts) => {
   };
 
   const createNewProjectToken = (
+    testProjectOwner,
     testProjectImutableData = projectImutableData,
     testProjectName = projectName,
     from = govAddress
@@ -38,6 +39,7 @@ contract("Manager Contract", (accounts) => {
     return contract.createNewProject(
       getBytes(testProjectImutableData),
       testProjectName,
+      testProjectOwner,
       { from: from }
     );
   };
@@ -249,14 +251,23 @@ contract("Manager Contract", (accounts) => {
     it("can create a new project with secondary auth token", async () => {
       const admin = accounts[2];
       const userDataBytes = getBytes(testUserInfo);
+      const projectOwner = accounts[3];
 
       await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
 
       [admin, govAddress].map((a) => {
         contract
-          .createNewProject(getBytes(projectImutableData), projectName, {
-            from: a,
-          })
+          .createNewProject(
+            getBytes(projectImutableData),
+            projectName,
+            projectOwner,
+            {
+              from: a,
+            }
+          )
           .then((result) => {
             const emitedEvents = result.logs.map((e) => e.event);
 
@@ -279,10 +290,23 @@ contract("Manager Contract", (accounts) => {
 
       [fakeUser, user, projectOwner].map(async (a) => {
         await truffleAssert.reverts(
-          createNewProjectToken(projectImutableData, projectName, a),
+          createNewProjectToken(
+            projectOwner,
+            projectImutableData,
+            projectName,
+            a
+          ),
           "You havent authority to access ERROR:1"
         );
       });
+    });
+    it("can not create a new project without correct project owner", async () => {
+      const fakeProjectOwner = accounts[4];
+
+      await truffleAssert.reverts(
+        createNewProjectToken(fakeProjectOwner),
+        "invalid project owner Error:7"
+      );
     });
   });
 
@@ -410,7 +434,13 @@ contract("Manager Contract", (accounts) => {
   });
   describe("getProjectById", () => {
     it("can get project contract address by id", async () => {
-      await createNewProjectToken();
+      const projectOwner = accounts[5];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+      await createNewProjectToken(projectOwner);
 
       const result = await contract.getProjectById(0, { from: govAddress });
 
@@ -420,7 +450,13 @@ contract("Manager Contract", (accounts) => {
 
   describe("changeTokenMoneyRequestingState", () => {
     it("can change token money requesting state", async () => {
-      await createNewProjectToken();
+      const projectOwner = accounts[5];
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+      await createNewProjectToken(projectOwner);
 
       const result = await contract.changeTokenMoneyRequestingState(0, true, {
         from: govAddress,
@@ -442,7 +478,7 @@ contract("Manager Contract", (accounts) => {
         addNewUser(projectOwner, ProjectOwner, userDataBytes)
       );
 
-      await createNewProjectToken();
+      await createNewProjectToken(projectOwner);
 
       [user, projectOwner, fakeUser].map(async (a) => {
         await truffleAssert.reverts(
@@ -456,10 +492,15 @@ contract("Manager Contract", (accounts) => {
     it("can change token money requesting state with secondary auth", async () => {
       const admin = accounts[1];
       const userDataBytes = getBytes(testUserInfo);
+      const projectOwner = accounts[2];
+
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
 
       await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
 
-      await createNewProjectToken();
+      await createNewProjectToken(projectOwner);
 
       [admin, govAddress].map(async (a) => {
         await truffleAssert.passes(
