@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../utillContracts/Utility.sol";
+
 enum Role {
     NotRegisterd, //0
     Admin, // 1
@@ -23,5 +25,5 @@ interface IController {
 
 
     //external
-    function projectMoneyRequest(uint256 moneyRequest, uint256 tokenId, string memory reason) external ;
+    function projectMoneyRequest(MoneyRequest memory moneyRequest) external returns(uint256);
 }

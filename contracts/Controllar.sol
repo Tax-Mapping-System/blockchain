@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "./interface/IController.sol";
 import "./Token.sol";
+import "./utillContracts/Utility.sol";
 
 
 
@@ -22,6 +23,8 @@ contract Controllar is IController {
     mapping(address => mapping(uint16 => uint256)) private userPaymentsMap; // record user payments (useraddress=>(year=>moneyTotal))
 
     uint256 private availableMoneyRequestId; //help to tract money requests
+
+    mapping(uint256 => MoneyRequest) moneyRequestMap; //request id-> object
 
 
     constructor(){
@@ -153,8 +156,15 @@ contract Controllar is IController {
         emit changeTokenMoneyRequestingStateEvent( tokenId, state);
     }
 
-    function projectMoneyRequest(uint256 moneyRequest, uint256 tokenId,string memory reason) external override onlyTransactionAvailableProjectToken {
-        emit projectMoneyRequestEvent(msg.sender,tokenId,availableMoneyRequestId, moneyRequest,reason);
+    function projectMoneyRequest(MoneyRequest memory moneyRequest) external override onlyTransactionAvailableProjectToken returns(uint256) {
+
+        moneyRequest.requestId = availableMoneyRequestId;
+
+        moneyRequestMap[availableMoneyRequestId] = moneyRequest;
+
+        emit projectMoneyRequestEvent(msg.sender,moneyRequest.tokenId,availableMoneyRequestId, moneyRequest.money,moneyRequest.requestReason);
         availableMoneyRequestId++;
+
+        return moneyRequest.requestId ;
     }
 }

@@ -6,6 +6,8 @@ import "./utillContracts/Auth.sol";
 
 import "./interface/IController.sol";
 
+import "./utillContracts/Utility.sol";
+
 contract Token is IToken, Auth{
 
     bytes private immutableData;
@@ -13,7 +15,6 @@ contract Token is IToken, Auth{
     uint256 public immutable id;
 
     address private immutable controllerContractAddress = msg.sender;
-
 
     constructor(bytes memory projectImmutableData, string memory name, uint256 tokenId, address projectOwner)Auth(projectOwner)
     {
@@ -43,15 +44,26 @@ contract Token is IToken, Auth{
     }
 
     function moneyRequest(uint256 money, string memory reason) external onlyProjectAuth {
-        IController(controllerContractAddress).projectMoneyRequest(money, id, reason);
+        MoneyRequest memory moneyRequestObject = MoneyRequest({
+            requestId: 0,
+            money: money,
+            requestReason: reason,
+            requestBy: msg.sender,
+            status: ProjectMoneyEventType.SendMoneyRequest,
+            rejectReason: "",
+            rejectedBy: address(0),
+            tokenId: id
+        });
 
-        emit ProjectEvent(ProjectMoneyEventType.SendMoneyRequest,msg.sender,money, reason);
+        uint256 requetsId = IController(controllerContractAddress).projectMoneyRequest(moneyRequestObject);
+
+        emit MoneyReqeustEvent(requetsId, money, reason);
+        emit ProjectEvent(ProjectMoneyEventType.SendMoneyRequest, moneyRequestObject.requestBy, moneyRequestObject.money, moneyRequestObject.requestReason);
     }
 
     function withdrawMoney (uint256 money, string memory reason) external onlyProjectAuth{
 
         moneyWithdrow(money);
-
         emit ProjectEvent(ProjectMoneyEventType.MoneyWithdrawal,msg.sender,money, reason);
 
     }
