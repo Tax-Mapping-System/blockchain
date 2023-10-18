@@ -7,6 +7,7 @@ const [ReciverdMoney, SendMoneyRequest, MoneyWithdrawal] = [0, 1, 2];
 
 contract("Token Contract", (accounts) => {
   const govAddress = accounts[0];
+  const projectOwner = accounts[1];
 
   const projectImutableData = "{location:colombo,start_year:2021}";
   const projectName = "Nelum kuluna";
@@ -19,6 +20,7 @@ contract("Token Contract", (accounts) => {
       getBytes(projectImutableData),
       projectName,
       tokenId,
+      projectOwner,
       {
         from: govAddress,
       }
@@ -68,7 +70,7 @@ contract("Token Contract", (accounts) => {
 
     it("can not send money request without auth", async () => {
       await truffleAssert.reverts(
-        contract.moneyRequest(100, "for buy light", { from: accounts[1] }),
+        contract.moneyRequest(100, "for buy light", { from: accounts[2] }),
         "You havent authority to access ERROR:1"
       );
     });
@@ -76,7 +78,7 @@ contract("Token Contract", (accounts) => {
 
   describe("withdrawMoney", () => {
     it("can not withdraw money without token aith", async () => {
-      const fakeUser = accounts[1];
+      const fakeUser = accounts[2];
       const money = 1000;
       const reason = "buy bulbs for project";
 
