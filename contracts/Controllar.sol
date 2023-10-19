@@ -31,7 +31,7 @@ contract Controllar is IController {
         govAddress =  msg.sender;
         userRoleMap[msg.sender]= Role.Gov ;
         availableProjectId = 0;
-        availableMoneyRequestId = 0;
+        availableMoneyRequestId = 1;
     }
 
     //modifires
@@ -67,6 +67,18 @@ contract Controllar is IController {
 
     modifier onlyValidProjectOwner(address projectOwner){
         require(userRoleMap[projectOwner] == Role.ProjectOwner,"invalid project owner Error:7");
+        _;
+    }
+
+    modifier onlyValidRequestId(uint256 requestId){
+
+        MoneyRequest memory moneyRequest = moneyRequestMap[requestId];
+
+        require(
+        (moneyRequest.requestId != 0)  &&
+        (moneyRequest.status == ProjectMoneyEventType.SendMoneyRequest),
+        "invalid request id Error:8"
+        );
         _;
     }
 
@@ -166,5 +178,16 @@ contract Controllar is IController {
         availableMoneyRequestId++;
 
         return moneyRequest.requestId ;
+    }
+
+    function rejectMoneyRequest(uint256 requestID, string calldata reason) external onlySecondaryAuth onlyValidRequestId(requestID){
+        MoneyRequest memory moneyRequest = moneyRequestMap[requestID];
+
+        moneyRequest.status = ProjectMoneyEventType.Rejected;
+        moneyRequest.rejectedBy = msg.sender;
+        moneyRequest.rejectReason = reason;
+
+        moneyRequestMap[moneyRequest.requestId] = moneyRequest;
+        
     }
 }
