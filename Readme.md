@@ -8,3 +8,4 @@ error codes
 5: withdrawal amount incorrect
 6: insuffeciant contract eth balance
 7: Invalid project owner address
+8: Invalid money request id
