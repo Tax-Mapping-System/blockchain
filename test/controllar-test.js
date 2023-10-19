@@ -210,7 +210,7 @@ contract("Manager Contract", (accounts) => {
         addNewUser(adminAddress, Admin, userDataBytes)
       );
 
-      [govAddress, adminAddress].map((a) => {
+      [govAddress, adminAddress].forEach((a) => {
         contract
           .getIndividualUserData(newUser, {
             from: a,
@@ -236,7 +236,7 @@ contract("Manager Contract", (accounts) => {
         addNewUser(projectOwner, ProjectOwner, userDataBytes)
       );
 
-      [fakeUser, user, projectOwner].map(async (a) => {
+      [fakeUser, user, projectOwner].forEach(async (a) => {
         await truffleAssert.reverts(
           contract.getIndividualUserData(newUser, {
             from: a,
@@ -258,7 +258,7 @@ contract("Manager Contract", (accounts) => {
         addNewUser(projectOwner, ProjectOwner, userDataBytes)
       );
 
-      [admin, govAddress].map((a) => {
+      [admin, govAddress].forEach((a) => {
         contract
           .createNewProject(
             getBytes(projectImutableData),
@@ -288,7 +288,7 @@ contract("Manager Contract", (accounts) => {
         addNewUser(projectOwner, ProjectOwner, userDataBytes)
       );
 
-      [fakeUser, user, projectOwner].map(async (a) => {
+      [fakeUser, user, projectOwner].forEach(async (a) => {
         await truffleAssert.reverts(
           createNewProjectToken(
             projectOwner,
@@ -395,7 +395,7 @@ contract("Manager Contract", (accounts) => {
 
       await contract.payTax(year, { from: user, value: value });
 
-      [admin, govAddress].map((a) => {
+      [admin, govAddress].forEach((a) => {
         contract
           .getIndividualUserTaxPaymentDataInYear(user, year, {
             from: a,
@@ -422,7 +422,7 @@ contract("Manager Contract", (accounts) => {
 
       await contract.payTax(year, { from: user, value: value });
 
-      [projectOwner, user, fakeUser].map(async (a) => {
+      [projectOwner, user, fakeUser].forEach(async (a) => {
         await truffleAssert.reverts(
           contract.getIndividualUserTaxPaymentDataInYear(user, year, {
             from: fakeUser,
@@ -480,7 +480,7 @@ contract("Manager Contract", (accounts) => {
 
       await createNewProjectToken(projectOwner);
 
-      [user, projectOwner, fakeUser].map(async (a) => {
+      [user, projectOwner, fakeUser].forEach(async (a) => {
         await truffleAssert.reverts(
           contract.changeTokenMoneyRequestingState(0, true, {
             from: a,
@@ -502,13 +502,56 @@ contract("Manager Contract", (accounts) => {
 
       await createNewProjectToken(projectOwner);
 
-      [admin, govAddress].map(async (a) => {
+      [admin, govAddress].forEach(async (a) => {
         await truffleAssert.passes(
           contract.changeTokenMoneyRequestingState(0, true, {
             from: a,
           })
         );
       });
+    });
+  });
+
+  describe("rejectMoneyRequest", () => {
+    it("can not access with the secondary auth", async () => {
+      const fakeUser = accounts[1];
+      const user = accounts[2];
+      const projectOwner = accounts[3];
+      const reason = "demo reason";
+
+      const requestId = 10;
+
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+
+      [user, projectOwner, fakeUser].forEach(async (a) => {
+        await truffleAssert.reverts(
+          contract.rejectMoneyRequest(requestId, reason, {
+            from: a,
+          }),
+          "You havent authority to access ERROR:1"
+        );
+      });
+    });
+    it("can not access with the correct request id", async () => {
+      const admin = accounts[1];
+      const fakeRequestId = 10;
+      const reason = "demo reason";
+
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
+
+      await truffleAssert.reverts(
+        contract.rejectMoneyRequest(fakeRequestId, reason, {
+          from: admin,
+        }),
+        "invalid request id Error:8"
+      );
     });
   });
 });
