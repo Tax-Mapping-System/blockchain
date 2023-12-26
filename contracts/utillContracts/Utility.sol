@@ -6,7 +6,8 @@ enum ProjectMoneyEventType {
     ReciverdMoney,
     SendMoneyRequest,
     MoneyWithdrawal,
-    Rejected
+    Rejected,
+    Approved
 }
 
 struct MoneyRequest{
@@ -18,4 +19,7 @@ struct MoneyRequest{
     string rejectReason;
     address rejectedBy;
     uint256 tokenId;
+       
+    address approvedBy;
+
 }

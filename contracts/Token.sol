@@ -52,7 +52,8 @@ contract Token is IToken, Auth{
             status: ProjectMoneyEventType.SendMoneyRequest,
             rejectReason: "",
             rejectedBy: address(0),
-            tokenId: id
+            tokenId: id,
+            approvedBy:address(0)
         });
 
         uint256 requetsId = IController(controllerContractAddress).projectMoneyRequest(moneyRequestObject);

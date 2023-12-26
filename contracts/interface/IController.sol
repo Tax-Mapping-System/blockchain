@@ -22,6 +22,8 @@ interface IController {
     event taxPayment (address indexed user, uint16 indexed year, uint payment);
     event projectMoneyRequestEvent (address indexed tokenAddress, uint256 indexed tokenId, uint256 indexed requestId, uint256 money, string reason );
     event changeTokenMoneyRequestingStateEvent (uint256 indexed tokenId, bool state);
+    event approveMoneyRequestEvent(uint256 indexed requestId, address indexed approvedBy, uint256 money);
+    event rejectMoneyRequestEvent (uint256 indexed requestId, address indexed rejectedBy, uint256 money,string reason);
 
 
     //external
