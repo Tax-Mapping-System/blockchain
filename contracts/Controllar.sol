@@ -82,6 +82,17 @@ contract Controllar is IController {
         _;
     }
 
+    modifier onlyHaveMoney(uint256 requestId){
+        //check if contract available money
+         require( address(this).balance >= moneyRequestMap[requestId].money , "Insufficient funds in the contract Error:6");
+        _;
+    }
+
+    modifier onlyApprovalAvailable(uint256 requestId){
+        require(  moneyRequestMap[requestId].approvedBy == address(0) , "Approval not available Error:9");
+        _;
+    }
+
     //private
     function isSenderGovAddress() private view returns (bool) {
         return (msg.sender == govAddress);
@@ -188,6 +199,23 @@ contract Controllar is IController {
         moneyRequest.rejectReason = reason;
 
         moneyRequestMap[moneyRequest.requestId] = moneyRequest;
+
+        emit rejectMoneyRequestEvent(requestID,msg.sender,moneyRequest.money,reason);
         
+    }
+
+    function approveMoneyRequest (uint256 requestID) external onlySecondaryAuth onlyValidRequestId(requestID) onlyHaveMoney(requestID){
+        MoneyRequest memory moneyRequest = moneyRequestMap[requestID];
+
+        moneyRequest.status = ProjectMoneyEventType.Approved;
+        moneyRequest.approvedBy = msg.sender;
+        moneyRequestMap[moneyRequest.requestId] = moneyRequest;
+
+        address tokenAddress = projectMap[moneyRequest.tokenId];
+        payable(tokenAddress).transfer(moneyRequest.money);
+
+
+        emit approveMoneyRequestEvent(requestID,msg.sender, moneyRequest.money);
+
     }
 }
