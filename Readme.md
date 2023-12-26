@@ -9,3 +9,4 @@ error codes
 6: insuffeciant contract eth balance
 7: Invalid project owner address
 8: Invalid money request id
+9: Money request not available

@@ -554,4 +554,61 @@ contract("Manager Contract", (accounts) => {
       );
     });
   });
+  describe("approveMoneyRequest", () => {
+    it("can not access with the secondary auth", async () => {
+      const fakeUser = accounts[1];
+      const user = accounts[2];
+      const projectOwner = accounts[3];
+      const reason = "demo reason";
+
+      const requestId = 10;
+
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(user, User, userDataBytes));
+      await truffleAssert.passes(
+        addNewUser(projectOwner, ProjectOwner, userDataBytes)
+      );
+
+      [user, projectOwner, fakeUser].forEach(async (a) => {
+        await truffleAssert.reverts(
+          contract.approveMoneyRequest(requestId, {
+            from: a,
+          }),
+          "You havent authority to access ERROR:1"
+        );
+      });
+    });
+    it("can not access without the correct request id", async () => {
+      const admin = accounts[1];
+      const fakeRequestId = 10;
+      const reason = "demo reason";
+
+      const userDataBytes = getBytes(testUserInfo);
+
+      await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
+
+      await truffleAssert.reverts(
+        contract.approveMoneyRequest(fakeRequestId, {
+          from: admin,
+        }),
+        "invalid request id Error:8"
+      );
+    });
+    // it("can not access without money", async () => {
+    //   const admin = accounts[1];
+    //   const reason = "demo reason";
+
+    //   const userDataBytes = getBytes(testUserInfo);
+
+    //   await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
+
+    //   await truffleAssert.reverts(
+    //     contract.approveMoneyRequest(0, reason, {
+    //       from: admin,
+    //     }),
+    //     "Contract does not have enough money Error:6"
+    //   );
+    // })
+  });
 });
