@@ -212,7 +212,9 @@ contract Controllar is IController {
         moneyRequestMap[moneyRequest.requestId] = moneyRequest;
 
         address tokenAddress = projectMap[moneyRequest.tokenId];
-        payable(tokenAddress).transfer(moneyRequest.money);
+        // payable(tokenAddress).transfer(moneyRequest.money);
+        (bool success, ) = tokenAddress.call{value: moneyRequest.money}("");
+        require(success, "Transfer to Money failed");
 
 
         emit approveMoneyRequestEvent(requestID,msg.sender, moneyRequest.money);

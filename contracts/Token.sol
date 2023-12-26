@@ -68,5 +68,7 @@ contract Token is IToken, Auth{
         emit ProjectEvent(ProjectMoneyEventType.MoneyWithdrawal,msg.sender,money, reason);
 
     }
+
+    receive() external payable {}
  
 }
