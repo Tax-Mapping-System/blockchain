@@ -24,7 +24,7 @@ contract Controllar is IController {
 
     uint256 private availableMoneyRequestId; //help to tract money requests
 
-    mapping(uint256 => MoneyRequest) moneyRequestMap; //request id-> object
+    mapping(uint256 => MoneyRequest) private moneyRequestMap; //request id-> object
 
 
     constructor(){
@@ -142,7 +142,8 @@ contract Controllar is IController {
         return getUserData(userAddress);
     }
 
-    function createNewProject(bytes memory projectImutableData, string memory projectName, address projectOwner) external onlySecondaryAuth onlyValidProjectOwner(projectOwner){
+    function createNewProject(bytes memory projectImutableData, string memory projectName, address projectOwner) external 
+    onlySecondaryAuth onlyValidProjectOwner(projectOwner){
 
         address newProjectAddress = address(new Token(projectImutableData,projectName, availableProjectId, projectOwner));
 
@@ -155,11 +156,11 @@ contract Controllar is IController {
         availableProjectId++;
     }
 
-    function payTax(uint16 year) external payable onlyRegisterdUser{
+    function payTax(uint16 year,string calldata date, string calldata nic) external payable onlyRegisterdUser{
         
         userPaymentsMap[msg.sender][year] += msg.value;
         
-        emit taxPayment(msg.sender, year, msg.value);
+        emit taxPayment(msg.sender, year,date,nic, msg.value);
     } 
 
     function getMyTaxPaymentDataInYear(uint16 year) external view returns(uint){
@@ -204,7 +205,8 @@ contract Controllar is IController {
         
     }
 
-    function approveMoneyRequest (uint256 requestID) external onlySecondaryAuth onlyValidRequestId(requestID) onlyHaveMoney(requestID){
+    function approveMoneyRequest (uint256 requestID) external onlySecondaryAuth onlyValidRequestId(requestID) 
+        onlyHaveMoney(requestID){
         MoneyRequest memory moneyRequest = moneyRequestMap[requestID];
 
         moneyRequest.status = ProjectMoneyEventType.Approved;

@@ -59,7 +59,8 @@ contract Token is IToken, Auth{
         uint256 requetsId = IController(controllerContractAddress).projectMoneyRequest(moneyRequestObject);
 
         emit MoneyReqeustEvent(requetsId, money, reason);
-        emit ProjectEvent(ProjectMoneyEventType.SendMoneyRequest, moneyRequestObject.requestBy, moneyRequestObject.money, moneyRequestObject.requestReason);
+        emit ProjectEvent(ProjectMoneyEventType.SendMoneyRequest, 
+        moneyRequestObject.requestBy, moneyRequestObject.money, moneyRequestObject.requestReason);
     }
 
     function withdrawMoney (uint256 money, string memory reason) external onlyProjectAuth{

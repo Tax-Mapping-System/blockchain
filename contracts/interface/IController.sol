@@ -19,8 +19,9 @@ interface IController {
     //events
     event registerNewUserAddress(address indexed user, Role indexed role);
     event createNewProjectToken (uint256 indexed projectId, address indexed tokenAddress, string projectName);
-    event taxPayment (address indexed user, uint16 indexed year, uint payment);
-    event projectMoneyRequestEvent (address indexed tokenAddress, uint256 indexed tokenId, uint256 indexed requestId, uint256 money, string reason );
+    event taxPayment (address indexed user, uint16 indexed year,string date, string nic, uint payment);
+    event projectMoneyRequestEvent (address indexed tokenAddress, uint256 indexed tokenId, uint256 indexed requestId, 
+    uint256 money, string reason );
     event changeTokenMoneyRequestingStateEvent (uint256 indexed tokenId, bool state);
     event approveMoneyRequestEvent(uint256 indexed requestId, address indexed approvedBy, uint256 money);
     event rejectMoneyRequestEvent (uint256 indexed requestId, address indexed rejectedBy, uint256 money,string reason);
