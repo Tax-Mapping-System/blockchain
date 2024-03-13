@@ -316,10 +316,12 @@ contract("Manager Contract", (accounts) => {
       const userDataBytes = getBytes(testUserInfo);
       const value = 1000000;
       const year = 2023;
+      const date = "2023/10/10";
+      const nic = "2000000";
 
       await truffleAssert.passes(addNewUser(user, User, userDataBytes));
 
-      const result = await contract.payTax(year, {
+      const result = await contract.payTax(year, date, nic, {
         from: user,
         value: value,
       });
@@ -333,9 +335,11 @@ contract("Manager Contract", (accounts) => {
       const user = accounts[1];
       const value = 1000000;
       const year = 2023;
+      const date = "2023/10/10";
+      const nic = "2000000";
 
       await truffleAssert.reverts(
-        contract.payTax(year, { from: user, value: value }),
+        contract.payTax(year, date, nic, { from: user, value: value }),
         "You havent registerd yet ERROR:3"
       );
     });
@@ -347,10 +351,12 @@ contract("Manager Contract", (accounts) => {
       const userDataBytes = getBytes(testUserInfo);
       const value = 1000000;
       const year = 2023;
+      const date = "2023/10/10";
+      const nic = "2000000";
 
       await truffleAssert.passes(addNewUser(user, User, userDataBytes));
 
-      await contract.payTax(year, { from: user, value: value });
+      await contract.payTax(year, date, nic, { from: user, value: value });
 
       const result = await contract.getMyTaxPaymentDataInYear(year, {
         from: user,
@@ -366,10 +372,12 @@ contract("Manager Contract", (accounts) => {
       const userDataBytes = getBytes(testUserInfo);
       const year = 2023;
       const value = 1000000;
+      const date = "2023/10/10";
+      const nic = "2000000";
 
       await truffleAssert.passes(addNewUser(user, User, userDataBytes));
 
-      await contract.payTax(year, { from: user, value: value });
+      await contract.payTax(year, date, nic, { from: user, value: value });
 
       const result = await contract.getIndividualUserTaxPaymentDataInYear(
         user,
@@ -389,11 +397,13 @@ contract("Manager Contract", (accounts) => {
 
       const year = 2023;
       const value = 1000000;
+      const date = "2023/10/10";
+      const nic = "2000000";
 
       await truffleAssert.passes(addNewUser(user, User, userDataBytes));
       await truffleAssert.passes(addNewUser(admin, Admin, userDataBytes));
 
-      await contract.payTax(year, { from: user, value: value });
+      await contract.payTax(year, date, nic, { from: user, value: value });
 
       [admin, govAddress].forEach((a) => {
         contract
@@ -414,13 +424,15 @@ contract("Manager Contract", (accounts) => {
 
       const year = 2023;
       const value = 1000000;
+      const date = "2023/10/10";
+      const nic = "2000000";
 
       await truffleAssert.passes(addNewUser(user, User, userDataBytes));
       await truffleAssert.passes(
         addNewUser(projectOwner, ProjectOwner, userDataBytes)
       );
 
-      await contract.payTax(year, { from: user, value: value });
+      await contract.payTax(year, date, nic, { from: user, value: value });
 
       [projectOwner, user, fakeUser].forEach(async (a) => {
         await truffleAssert.reverts(
